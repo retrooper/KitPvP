@@ -1,0 +1,12 @@
+
+H
+java:S1452h"&Remove usage of generic wildcard type.(ÊıÀµùÿÿÿÿ8ÏĞ­É.
+\	java:S899/"BDo something with the "boolean" value returned by "createNewFile".(Ğ’Íùÿÿÿÿ
+=
+java:S1452"&Remove usage of generic wildcard type.(œêä¼
+d
+java:S2095@"NUse try-with-resources or close this "FileOutputStream" in a "finally" clause.(±ñ•Œ
+=
+java:S1452"&Remove usage of generic wildcard type.(œêä¼
+h
+java:S2095?"MUse try-with-resources or close this "FileInputStream" in a "finally" clause.(Ôğ±¯şÿÿÿÿ

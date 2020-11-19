@@ -1,0 +1,7 @@
+
+G
+java:S1068"*Remove this unused "bounty" private field.(áÅ¿‘8É­ûØÖ.
+i
+java:S2677¶"LUse or store the value returned from "readLine" instead of throwing it away.(ÿ‡è08Ï„Ü­É.
+c
+java:S2095µ"LUse try-with-resources or close this "BufferedReader" in a "finally" clause.(°“èû
