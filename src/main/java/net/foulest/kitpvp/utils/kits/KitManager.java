@@ -8,37 +8,47 @@ import java.util.List;
 
 public class KitManager {
 
-	private final List<Kit> kits = new ArrayList<>();
-	private static final KitManager instance = new KitManager();
+    private static final KitManager instance = new KitManager();
+    private final List<Kit> kits = new ArrayList<>();
 
-	public static KitManager getInstance() {
-		return instance;
-	}
+    public static KitManager getInstance() {
+        return instance;
+    }
 
-	public void registerKit(Kit kit) {
-		kits.add(kit);
-	}
+    public void registerKit(Kit kit) {
+        kits.add(kit);
+    }
 
-	public void unloadKits() {
-		kits.clear();
-	}
+    public void unloadKits() {
+        kits.clear();
+    }
 
-	public List<Kit> getKits() {
-		return kits;
-	}
+    public List<Kit> getKits() {
+        return kits;
+    }
 
-	public Kit valueOf(String name) {
-		for (Kit kit : kits) {
-			if (kit.getName().equalsIgnoreCase(name)) {
-				return kit;
-			}
-		}
+    public Kit valueOf(String name) {
+        for (Kit kit : kits) {
+            if (kit.getName().equalsIgnoreCase(name)) {
+                return kit;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public boolean hasRequiredKit(Player player, String required) {
-		KitUser user = KitUser.getInstance(player);
-		return user.hasKit() && valueOf(required) != null && user.getKit().getName().equals(valueOf(required).getName());
-	}
+    public Kit valueOfId(int id) {
+        for (Kit kit : kits) {
+            if (kit.getId() == id) {
+                return kit;
+            }
+        }
+
+        return null;
+    }
+
+    public boolean hasRequiredKit(Player player, String required) {
+        KitUser user = KitUser.getInstance(player);
+        return user.hasKit() && valueOf(required) != null && user.getKit().getName().equals(valueOf(required).getName());
+    }
 }

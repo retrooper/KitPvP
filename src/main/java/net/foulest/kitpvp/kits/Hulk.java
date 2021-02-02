@@ -1,13 +1,11 @@
 package net.foulest.kitpvp.kits;
 
-import net.foulest.kitpvp.KitPvP;
-import net.foulest.kitpvp.utils.ConfigManager;
 import net.foulest.kitpvp.utils.ItemBuilder;
+import net.foulest.kitpvp.utils.SkullCreator;
 import net.foulest.kitpvp.utils.kits.Kit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -17,12 +15,14 @@ import java.util.Objects;
 
 public class Hulk implements Kit {
 
-    private final KitPvP kitPvP = KitPvP.getInstance();
-    private final ConfigManager config = kitPvP.getConfigFile();
-
     @Override
     public String getName() {
         return "Hulk";
+    }
+
+    @Override
+    public int getId() {
+        return 7;
     }
 
     @Override
@@ -47,13 +47,11 @@ public class Hulk implements Kit {
 
     @Override
     public ItemStack[] getArmor() {
-        ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
-        SkullMeta meta = (SkullMeta) skull.getItemMeta();
-        meta.setOwner("Hulk");
-        skull.setItemMeta(meta);
+        String base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZ"
+                + "GJhMTIwZTM3MjdkZDc3MDY2Mjk3MThhNTE3MTI1YjFkNTgwNWZmYTUxM2E3ZDcxZmYyMmRiYTg4NjRmZWMzMSJ9fX0=";
 
         return new ItemStack[]{
-                new ItemBuilder(skull).name("&fHulk's Head").unbreakable(true).build(),
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fHulk's Head").unbreakable(true).build(),
                 new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0x3E7F2B)).unbreakable(true).build(),
                 new ItemBuilder(Material.DIAMOND_LEGGINGS).unbreakable(true).build(),
                 new ItemBuilder(Material.LEATHER_BOOTS).color(Color.fromRGB(0x3E7F2B)).unbreakable(true).build()
@@ -61,17 +59,22 @@ public class Hulk implements Kit {
     }
 
     @Override
-    public String[] getDescription() {
-        return new String[]{
-                "&7Attack: &f5.0",
-                "&7Defense: &f5.0",
-                "",
-                "&7Hulk SMASH opponents away."
-        };
+    public String getDescription() {
+        return "&7Hulk SMASH opponents away.";
+    }
+
+    @Override
+    public double getAttack() {
+        return 5.0;
+    }
+
+    @Override
+    public double getDefense() {
+        return 5.0;
     }
 
     @Override
     public int getCost() {
-        return config.getInt("coins.kit-cost");
+        return 250;
     }
 }

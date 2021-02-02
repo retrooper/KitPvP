@@ -6,11 +6,12 @@ import net.foulest.kitpvp.utils.command.Command;
 import net.foulest.kitpvp.utils.command.CommandArgs;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class PayCmd {
 
-    @Command(name = "pay", description = "Send coins to another player.", usage = "/pay <player> <amount>", permission = "kitpvp.pay", inGameOnly = true)
+    @Command(name = "pay", description = "Send coins to another player.", usage = "/pay <player> <amount>", inGameOnly = true)
     public void onCommand(CommandArgs args) {
         Player target = Bukkit.getPlayer(args.getArgs(0));
 
@@ -46,9 +47,10 @@ public class PayCmd {
 
             targetUser.setCoins((Integer.parseInt(amount) + oldAmount));
             senderUser.removeCoins(Integer.parseInt(amount));
-            targetUser.save();
+            targetUser.saveStats();
 
             if ((args.getSender() instanceof Player) && target == args.getSender()) {
+                player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0f, 1.0f);
                 MiscUtils.messagePlayer(target, "&cYou can't pay yourself.");
                 return;
             }

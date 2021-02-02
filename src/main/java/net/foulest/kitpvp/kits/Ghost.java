@@ -1,7 +1,5 @@
 package net.foulest.kitpvp.kits;
 
-import net.foulest.kitpvp.KitPvP;
-import net.foulest.kitpvp.utils.ConfigManager;
 import net.foulest.kitpvp.utils.ItemBuilder;
 import net.foulest.kitpvp.utils.kits.Kit;
 import org.bukkit.Material;
@@ -16,12 +14,14 @@ import java.util.Objects;
 
 public class Ghost implements Kit {
 
-    private final KitPvP kitPvP = KitPvP.getInstance();
-    private final ConfigManager config = kitPvP.getConfigFile();
-
     @Override
     public String getName() {
         return "Ghost";
+    }
+
+    @Override
+    public int getId() {
+        return 6;
     }
 
     @Override
@@ -54,17 +54,22 @@ public class Ghost implements Kit {
     }
 
     @Override
-    public String[] getDescription() {
-        return new String[]{
-                "&7Attack: &f9.5",
-                "&7Defense: &f0.0",
-                "",
-                "&7Permanent invisibility."
-        };
+    public String getDescription() {
+        return "&7Permanent invisibility.";
+    }
+
+    @Override
+    public double getAttack() {
+        return 9.5;
+    }
+
+    @Override
+    public double getDefense() {
+        return 0.0;
     }
 
     @Override
     public int getCost() {
-        return config.getInt("coins.kit-cost");
+        return 250;
     }
 }

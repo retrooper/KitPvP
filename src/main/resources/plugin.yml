@@ -1,5 +1,6 @@
 name: KitPvP
-version: '1.0.0'
+version: '1.0.1'
 main: net.foulest.kitpvp.KitPvP
 author: Foulest
-depend: [PlaceholderAPI, WorldEdit, WorldGuard]
+depend: [PlaceholderAPI, WorldEdit, WorldGuard, LunarClient-API]
+loadbefore: [Essentials]

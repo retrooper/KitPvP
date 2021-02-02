@@ -1,19 +1,31 @@
 package net.foulest.kitpvp.utils;
 
+import com.lunarclient.bukkitapi.LunarClientAPI;
+import com.lunarclient.bukkitapi.object.LCCooldown;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.foulest.kitpvp.KitPvP;
 import net.foulest.kitpvp.utils.kits.Kit;
 import net.foulest.kitpvp.utils.kits.KitManager;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public class KitUser {
@@ -22,20 +34,30 @@ public class KitUser {
     private final Player player;
     private final Map<String, Long> cooldowns = new HashMap<>();
     private final KitPvP kitPvP = KitPvP.getInstance();
+    private final MySQL mySQL = MySQL.getInstance();
+    private final LunarClientAPI lunarAPI = LunarClientAPI.getInstance();
     private final KitManager kitManager = KitManager.getInstance();
-    private final Set<Kit> ownedKits = new HashSet<>();
+    private final List<Kit> ownedKits = new ArrayList<>();
     private BukkitTask abilityCooldownNotifier;
-    private ConfigManager file;
     private Kit kit;
     private Kit previousKit;
     private int coins;
     private int kills;
+    private int experience;
+    private int level;
     private int deaths;
     private int killstreak;
+    private int topKillstreak;
+    private boolean teleportingToSpawn;
+    private boolean inStaffMode;
+    private boolean isLoaded;
+    private boolean pendingNoFallRemoval;
+    private String clientBrand;
 
     private KitUser(Player player) {
         this.player = player;
         this.kit = null;
+
         instances.add(this);
     }
 
@@ -48,6 +70,58 @@ public class KitUser {
         }
 
         return new KitUser(player);
+    }
+
+    public boolean isInRegion() {
+        WorldGuardPlugin worldGuard = WorldGuardPlugin.inst();
+        RegionManager regionManager = worldGuard.getRegionManager(player.getLocation().getWorld());
+        ApplicableRegionSet set = regionManager.getApplicableRegions(player.getLocation());
+
+        for (ProtectedRegion region : set) {
+            return region != null;
+        }
+
+        return false;
+    }
+
+    public boolean isInRegion(Location loc) {
+        WorldGuardPlugin worldGuard = WorldGuardPlugin.inst();
+        RegionManager regionManager = worldGuard.getRegionManager(loc.getWorld());
+        ApplicableRegionSet set = regionManager.getApplicableRegions(loc);
+
+        for (ProtectedRegion region : set) {
+            return region != null;
+        }
+
+        return false;
+    }
+
+    public boolean isInSafezone() {
+        WorldGuardPlugin worldGuard = WorldGuardPlugin.inst();
+        RegionManager regionManager = worldGuard.getRegionManager(player.getLocation().getWorld());
+        ApplicableRegionSet set = regionManager.getApplicableRegions(player.getLocation());
+
+        if (isInRegion()) {
+            for (ProtectedRegion region : set) {
+                return region.getFlag(DefaultFlag.PVP) == StateFlag.State.DENY;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean isInSafezone(Location loc) {
+        WorldGuardPlugin worldGuard = WorldGuardPlugin.inst();
+        RegionManager regionManager = worldGuard.getRegionManager(loc.getWorld());
+        ApplicableRegionSet set = regionManager.getApplicableRegions(loc);
+
+        if (isInRegion()) {
+            for (ProtectedRegion region : set) {
+                return region.getFlag(DefaultFlag.PVP) == StateFlag.State.DENY;
+            }
+        }
+
+        return false;
     }
 
     public Player getPlayer() {
@@ -86,7 +160,7 @@ public class KitUser {
         ownedKits.add(kit);
     }
 
-    public Set<Kit> getKits() {
+    public List<Kit> getKits() {
         return ownedKits;
     }
 
@@ -126,14 +200,23 @@ public class KitUser {
     public void clearCooldowns() {
         cooldowns.clear();
 
+        if (hasKit() && isOnLunar()) {
+            lunarAPI.clearCooldown(player, new LCCooldown("Ability", 0L, TimeUnit.SECONDS,
+                    getKit().getDisplayItem().getType()));
+        }
+
         if (abilityCooldownNotifier != null) {
             abilityCooldownNotifier.cancel();
             abilityCooldownNotifier = null;
         }
     }
 
-    public void setCooldown(String kitName, int cooldownTime, boolean notify) {
-        cooldowns.put(kitName, System.currentTimeMillis() + cooldownTime * 1000);
+    public void setCooldown(String kitName, Material icon, int cooldownTime, boolean notify) {
+        cooldowns.put(kitName, System.currentTimeMillis() + cooldownTime * 1000L);
+
+        if (hasKit() && isOnLunar()) {
+            lunarAPI.sendCooldown(player, new LCCooldown("Ability", cooldownTime, TimeUnit.SECONDS, icon));
+        }
 
         if (notify) {
             abilityCooldownNotifier = new BukkitRunnable() {
@@ -162,59 +245,68 @@ public class KitUser {
         this.deaths = deaths;
     }
 
-    public void load() throws IOException {
-        KitUser kitUser = KitUser.getInstance(player);
-        file = new ConfigManager(player.getUniqueId().toString(), "players");
+    public void load() throws SQLException {
+        isLoaded = true;
 
-        if (!file.getFile().exists()) {
-            kitUser.save();
+        if (!mySQL.exists("*", "PlayerStats", "uuid", "=", player.getUniqueId().toString())) {
+            mySQL.update("INSERT INTO PlayerStats (uuid, coins, experience, kills, deaths, killstreak, topKillstreak)" +
+                    " VALUES ('" + player.getUniqueId().toString() + "', " + 500 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ", " + 0 + ")");
         }
 
-        BufferedReader reader = new BufferedReader(new FileReader(file.getFile()));
+        if (!mySQL.exists("*", "PlayerKits", "uuid", "=", player.getUniqueId().toString())) {
+            mySQL.update("INSERT INTO PlayerKits (uuid, kitId) VALUES ('" + player.getUniqueId().toString() + "', " + 10 + ")");
+        } else {
+            ResultSet result;
 
-        if (reader.readLine() == null) {
-            file.setFile(ConfigManager.transferData(kitPvP.getDefaultPlayerFile(), file));
-            reader.close();
-        }
+            try (Connection connection = kitPvP.getHikari().getConnection();
+                 PreparedStatement select = connection.prepareStatement("SELECT * FROM PlayerKits WHERE uuid='" + player.getUniqueId().toString() + "'")) {
+                result = select.executeQuery();
 
-        if (!file.getList("kits").isEmpty()) {
-            for (String kits : file.getStringList("kits")) {
-                ownedKits.add(kitManager.valueOf(kits));
+                while (result.next()) {
+                    ownedKits.add(kitManager.valueOfId(result.getInt("kitId")));
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
 
-        setCoins(file.getInt("coins"));
-        setKills(file.getInt("kills"));
-        setDeaths(file.getInt("deaths"));
-        setKillstreak(file.getInt("killstreak"));
+        setCoins((Integer) mySQL.get("coins", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setExperience((Integer) mySQL.get("experience", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setKills((Integer) mySQL.get("kills", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setDeaths((Integer) mySQL.get("deaths", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setKillstreak((Integer) mySQL.get("killstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
+        setTopKillstreak((Integer) mySQL.get("topKillstreak", "*", "PlayerStats", "uuid", "=", player.getUniqueId().toString()));
     }
 
-    public void save() {
+    public void saveAll() {
         if (!ownedKits.isEmpty()) {
-            List<String> kitList = new ArrayList<>();
+            mySQL.update("DELETE FROM PlayerKits WHERE uuid='" + player.getUniqueId().toString() + "';");
 
             for (Kit kits : ownedKits) {
                 if (kits == null) {
                     continue;
                 }
 
-                kitList.add(kits.getName());
+                mySQL.update("INSERT INTO PlayerKits (uuid, kitId) VALUES ('" + player.getUniqueId().toString() + "', " + kits.getId() + ");");
             }
-
-            file.set("kits", kitList);
         }
 
-        file.set("coins", getCoins());
-        file.set("kills", getKills());
-        file.set("deaths", getDeaths());
-        file.set("killstreak", getKillstreak());
+        saveStats();
+    }
+
+    public void saveStats() {
+        mySQL.update("UPDATE PlayerStats SET coins=" + getCoins() + ", experience=" + getExperience()
+                + ", kills=" + getKills() + ", deaths=" + getDeaths() + ", killstreak=" + getKillstreak()
+                + ", topKillstreak=" + getTopKillstreak() + " WHERE uuid='" + player.getUniqueId().toString() + "';");
     }
 
     public void unload() {
+        isLoaded = false;
         ownedKits.clear();
         kit = null;
         previousKit = null;
-        file = null;
+        teleportingToSpawn = false;
         instances.remove(this);
     }
 
@@ -230,16 +322,33 @@ public class KitUser {
         return killstreak;
     }
 
-    public void setKillstreak(int killstreak) {
-        this.killstreak = killstreak;
+    public void setKillstreak(int streak) {
+        killstreak = streak;
+        setTopKillstreak();
     }
 
     public void addKillstreak() {
         killstreak += 1;
+        setTopKillstreak();
     }
 
     public void resetKillStreak() {
         killstreak = 0;
+    }
+
+    public int getTopKillstreak() {
+        return topKillstreak;
+    }
+
+    public void setTopKillstreak(int streak) {
+        topKillstreak = streak;
+    }
+
+    public void setTopKillstreak() {
+        if (killstreak > topKillstreak) {
+            topKillstreak = killstreak;
+            saveStats();
+        }
     }
 
     public double getKDR() {
@@ -247,6 +356,114 @@ public class KitUser {
     }
 
     public String getKDRText() {
-        return new DecimalFormat("#.##").format(getKDR());
+        String decimalFormatStr = "####0.00";
+        DecimalFormat format = new DecimalFormat(decimalFormatStr);
+
+        return format.format(getKDR());
+    }
+
+    public boolean isInStaffMode() {
+        return inStaffMode;
+    }
+
+    public void setStaffMode(boolean value) {
+        inStaffMode = value;
+    }
+
+    public boolean isPendingNoFallRemoval() {
+        return pendingNoFallRemoval;
+    }
+
+    public void setPendingNoFallRemoval(boolean value) {
+        pendingNoFallRemoval = value;
+    }
+
+    public boolean isLoaded() {
+        return isLoaded;
+    }
+
+    public String getClientBrand() {
+        return clientBrand;
+    }
+
+    public void setClientBrand(String brand) {
+        clientBrand = brand;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getExperience() {
+        return experience;
+    }
+
+    public void setExperience(int exp) {
+        experience = exp;
+        calcLevel(false);
+    }
+
+    public void addExperience(int exp) {
+        experience += exp;
+        calcLevel(true);
+    }
+
+    public float getExpDecimal() {
+        float decimal;
+        String decimalFormatStr = "#####.0#";
+        DecimalFormat format = new DecimalFormat(decimalFormatStr);
+        int nextLevelXP = (level * 25) * 25;
+        int pastLevelXP = (Math.max(1, level - 1) * 25) * 25;
+
+        if (level == 1) {
+            decimal = ((float) experience / nextLevelXP);
+        } else {
+            decimal = ((float) (experience - pastLevelXP) / (nextLevelXP - pastLevelXP));
+        }
+
+        return Float.parseFloat(format.format(decimal));
+    }
+
+    public double getExpPercent() {
+        double percent;
+        String decimalFormatStr = "#####.0#";
+        DecimalFormat format = new DecimalFormat(decimalFormatStr);
+        int nextLevelXP = (level * 25) * 25;
+        int pastLevelXP = (Math.max(1, level - 1) * 25) * 25;
+
+        if (level == 1) {
+            percent = ((double) experience / nextLevelXP) * 100;
+        } else {
+            percent = ((double) (experience - pastLevelXP) / (nextLevelXP - pastLevelXP)) * 100;
+        }
+
+        return Double.parseDouble(format.format(percent));
+    }
+
+    public void calcLevel(boolean afterKill) {
+        if (experience == 0) {
+            level = 1;
+        } else if ((double) experience / ((level * 25) * 25) >= 1.0) {
+            level += 1;
+
+            if (afterKill) {
+                MiscUtils.messagePlayer(player, "&b&lLEVEL UP! &7You are now &fLevel " + level + "!");
+            }
+        }
+
+        player.setLevel(level);
+        player.setExp(getExpDecimal());
+    }
+
+    public boolean isOnLunar() {
+        return getClientBrand().contains("lunarclient:") && lunarAPI.isRunningLunarClient(player);
+    }
+
+    public boolean isTeleportingToSpawn() {
+        return teleportingToSpawn;
+    }
+
+    public void setTeleportingToSpawn(boolean status) {
+        teleportingToSpawn = status;
     }
 }

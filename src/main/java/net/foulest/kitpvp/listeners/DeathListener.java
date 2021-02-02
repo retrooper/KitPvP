@@ -9,7 +9,7 @@ import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -19,14 +19,48 @@ import java.util.List;
 
 public class DeathListener implements Listener {
 
+    private static final KitPvP kitPvP = KitPvP.getInstance();
+    private static final KitListener kitListener = KitListener.getInstance();
+    private static final Spawn spawn = Spawn.getInstance();
+    private static final CombatLog combatLog = CombatLog.getInstance();
+
     public static void handleDeath(Player player) {
-        KitPvP kitPvP = KitPvP.getInstance();
-        ConfigManager config = kitPvP.getConfigFile();
-        Spawn spawn = Spawn.getInstance();
-        CombatLog combatLog = CombatLog.getInstance();
         KitUser receiver = KitUser.getInstance(player);
         Kit currentKit = receiver.getKit();
         Vector vec = new Vector();
+
+        // Cancels deaths while in staff mode.
+        if (receiver.isInStaffMode()) {
+            return;
+        }
+
+        // Removes potential player created Wolves.
+        if (receiver.hasKit()) {
+            if (currentKit.getName().equals("Tamer")) {
+                for (Entity entity : Bukkit.getWorld(player.getWorld().getUID()).getEntities()) {
+                    if (entity.getType() == EntityType.WOLF) {
+                        Wolf wolf = (Wolf) entity;
+
+                        if (wolf.getOwner() == player) {
+                            wolf.remove();
+                        }
+                    }
+                }
+            }
+
+            // Removes potential player created Iron Golems.
+            if (currentKit.getName().equals("Summoner")) {
+                for (Entity entity : Bukkit.getWorld(player.getWorld().getUID()).getEntities()) {
+                    if (entity.isValid() && entity.getType() == EntityType.IRON_GOLEM) {
+                        IronGolem ironGolem = (IronGolem) entity;
+
+                        if (ironGolem.hasMetadata(player.getName())) {
+                            ironGolem.remove();
+                        }
+                    }
+                }
+            }
+        }
 
         // On-death blood splatter effect.
         player.getWorld().playEffect(player.getLocation(), Effect.STEP_SOUND, Material.REDSTONE_BLOCK);
@@ -36,39 +70,53 @@ public class DeathListener implements Listener {
         // Sets the player's current kit and adds a death.
         receiver.setPreviousKit(currentKit);
         receiver.addDeath();
-        MiscUtils.sendActionbar(player, "&c&lYOU DIED! &7Your kit has been reset.");
 
         // Runs specific code if the player is killed by another player.
         if (combatLog.getLastAttacker(player) != null) {
             KitUser damager = KitUser.getInstance(combatLog.getLastAttacker(player));
-            int rewardAmount = config.getInt("coins.kill-bonus");
-            int inventorySize = damager.getPlayer().getInventory().getSize();
+            int rewardAmount = ConfigManager.get().getInt("coins.kill-bonus");
 
             // Adds a kill to the damager.
             damager.addKill();
             damager.addKillstreak();
             damager.getPlayer().playSound(damager.getPlayer().getLocation(), Sound.CHICKEN_EGG_POP, 0.5f, 0.0f);
 
-            // Sends all online players a killstreak message in chat.
-            // Gives the damager coins and refills their inventory with soup.
+            // Run specific code if the damager is on a multiple of 5 killstreak.
             if (damager.getKillstreak() >= 5 && damager.getKillstreak() % 5 == 0) {
+                // Sends all online players a killstreak message in chat.
                 MiscUtils.broadcastMessage("&e&lSTREAK! &f" + damager.getPlayer().getName() + " &7is on a &f" + damager.getKillstreak() + " &7killstreak!");
 
-                rewardAmount += damager.getKillstreak();
-
-                for (int i = 0; i < inventorySize; ++i) {
+                // Refills the damager's inventory with soup.
+                for (int i = 0; i < 36; ++i) {
                     damager.getPlayer().getInventory().addItem(new ItemBuilder(Material.MUSHROOM_SOUP).name("&fMushroom Soup").build());
                 }
 
+                // Re-adds the damager's kit items.
                 List<ItemStack> kitItems = damager.getKit().getItems();
                 for (int i = 0; i < kitItems.size(); ++i) {
                     damager.getPlayer().getInventory().setItem(i, kitItems.get(i));
                 }
             }
 
+            // Gives the damager coins and experience.
+            rewardAmount += 5 * (damager.getKillstreak() / 5);
             damager.addCoins(rewardAmount);
-            MiscUtils.sendActionbar(damager.getPlayer(), "&a&lKILL! &7You killed &f" + receiver.getPlayer().getName() + "&7. (+" + rewardAmount + " coins)");
+            damager.addExperience(25);
+
+            // Saves the damager's stats.
+            damager.saveStats();
+
+            // Prints kill messages to both the damager and receiver.
+            MiscUtils.messagePlayer(receiver.getPlayer(), "&c&lYOU DIED! &f" + damager.getPlayer().getName()
+                    + " &7killed you on &f" + damager.getPlayer().getHealth() + " health.");
+            MiscUtils.messagePlayer(damager.getPlayer(), "&a&lKILL! &7You killed &f" + receiver.getPlayer().getName()
+                    + "&7. (+" + rewardAmount + " coins, +25 exp)");
+        } else {
+            MiscUtils.messagePlayer(player, "&c&lYOU DIED! &7You killed yourself.");
         }
+
+        // Clears cooldowns.
+        receiver.clearCooldowns();
 
         // Sends all online players a killstreak message in chat.
         if (receiver.getKillstreak() >= 5) {
@@ -77,6 +125,9 @@ public class DeathListener implements Listener {
 
         // Removes the player's combat tag.
         combatLog.remove(player);
+
+        // Removes the player from a Vampire's drained effects list.
+        kitListener.drainedEffects.remove(player.getUniqueId());
 
         // Removes knockback before teleporting the player to spawn.
         Bukkit.getScheduler().runTaskLater(kitPvP, () -> player.setVelocity(vec), 1L);
@@ -99,9 +150,13 @@ public class DeathListener implements Listener {
 
         // Teleports the player to spawn.
         spawn.teleport(player);
+        player.getInventory().setHeldItemSlot(0);
         player.playSound(player.getLocation(), Sound.FALL_BIG, 0.5f, 0.0f);
 
         // Resets the player's killstreak.
         receiver.resetKillStreak();
+
+        // Saves the receiver's stats with the database.
+        receiver.saveStats();
     }
 }

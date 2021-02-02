@@ -8,14 +8,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class KitSelector {
 
+    public static final String INVENTORY_NAME = MiscUtils.colorize("Kit Selector");
+    private static final Map<Player, Integer> page = new HashMap<>();
     private final Inventory inv;
     private final KitManager kitManager = KitManager.getInstance();
-    private static final Map<Player, Integer> page = new HashMap<>();
-	public static final String INVENTORY_NAME = MiscUtils.colorize("Kit Selector");
 
     public KitSelector(Player player) {
         inv = Bukkit.createInventory(player, ensureSize(kitManager.getKits().size()) + 18, INVENTORY_NAME);
@@ -42,12 +45,12 @@ public class KitSelector {
     // Ensures that we use enough slots to hold all the kit items.
     private int ensureSize(int size) {
         if (size >= 36) {
-			return 36;
-		}
+            return 36;
+        }
 
         if ((size + 18) % 9 == 0) {
-			return size;
-		}
+            return size;
+        }
 
         return ensureSize(++size);
     }
@@ -73,6 +76,7 @@ public class KitSelector {
 
         try {
             List<Kit> futureCheck = kitManager.getKits().subList((page + 1) * 36, ((page + 1) * 36) + ensureKits(kitManager.getKits().size() - ((page + 1) * 36)));
+
             if (!futureCheck.isEmpty()) {
                 inv.setItem(inv.getSize() - 1, new ItemBuilder(Material.BOOK).name("&aNext Page").build());
             }
@@ -95,9 +99,13 @@ public class KitSelector {
     }
 
     private ItemStack createKitItem(Kit kit) {
-        List<String> items = new ArrayList<>(Arrays.asList(kit.getDescription()));
-        items.add("");
-        items.add("&aClick to equip this kit.");
-        return new ItemBuilder(kit.getDisplayItem()).name("&a" + kit.getName()).lore(items).build();
+        List<String> lore = new ArrayList<>();
+        lore.add("&7Attack: &f" + kit.getAttack());
+        lore.add("&7Defense: &f" + kit.getDefense());
+        lore.add("");
+        lore.add("&f" + kit.getDescription());
+        lore.add("");
+        lore.add("&aClick to equip this kit.");
+        return new ItemBuilder(kit.getDisplayItem()).name("&a" + kit.getName()).lore(lore).build();
     }
 }

@@ -33,7 +33,7 @@ public class EcoSetCmd {
         int amount = Integer.parseInt(args.getArgs(1));
 
         targetUser.setCoins(amount);
-        targetUser.save();
+        targetUser.saveStats();
 
         if ((args.getSender() instanceof Player) && target == args.getSender()) {
             MiscUtils.messagePlayer(target, "&aYou set your balance to " + targetUser.getCoins() + " coins.");

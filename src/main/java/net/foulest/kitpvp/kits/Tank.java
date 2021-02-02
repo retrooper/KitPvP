@@ -1,12 +1,10 @@
 package net.foulest.kitpvp.kits;
 
-import net.foulest.kitpvp.KitPvP;
-import net.foulest.kitpvp.utils.ConfigManager;
 import net.foulest.kitpvp.utils.ItemBuilder;
+import net.foulest.kitpvp.utils.SkullCreator;
 import net.foulest.kitpvp.utils.kits.Kit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -16,12 +14,14 @@ import java.util.Objects;
 
 public class Tank implements Kit {
 
-    private final KitPvP kitPvP = KitPvP.getInstance();
-    private final ConfigManager config = kitPvP.getConfigFile();
-
     @Override
     public String getName() {
         return "Tank";
+    }
+
+    @Override
+    public int getId() {
+        return 18;
     }
 
     @Override
@@ -44,13 +44,11 @@ public class Tank implements Kit {
 
     @Override
     public ItemStack[] getArmor() {
-        ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
-        SkullMeta meta = (SkullMeta) skull.getItemMeta();
-        meta.setOwner("KingPiglin");
-        skull.setItemMeta(meta);
+        String base64 = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYT"
+                + "Y1OWIyYmIwNzBjMTIwOGJhNTE0NTIzNjFmZDMwYTY2NzIxMzI5NWYyMWRiNDM3ZGY1NzI4MWQ1ODJjODlhZCJ9fX0=";
 
         return new ItemStack[]{
-                new ItemBuilder(skull).name("&fTank's Head").unbreakable(true).build(),
+                new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fTank's Head").unbreakable(true).build(),
                 new ItemBuilder(Material.DIAMOND_CHESTPLATE).unbreakable(true).build(),
                 new ItemBuilder(Material.DIAMOND_LEGGINGS).unbreakable(true).build(),
                 new ItemBuilder(Material.DIAMOND_BOOTS).unbreakable(true).build()
@@ -58,17 +56,22 @@ public class Tank implements Kit {
     }
 
     @Override
-    public String[] getDescription() {
-        return new String[]{
-                "&7Attack: &f4.0",
-                "&7Defense: &f9.0",
-                "",
-                "&7Slow but very resistant.",
-        };
+    public String getDescription() {
+        return "&7Slow but very resistant..";
+    }
+
+    @Override
+    public double getAttack() {
+        return 4.0;
+    }
+
+    @Override
+    public double getDefense() {
+        return 9.0;
     }
 
     @Override
     public int getCost() {
-        return config.getInt("coins.kit-cost");
+        return 250;
     }
 }

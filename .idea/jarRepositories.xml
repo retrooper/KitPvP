@@ -52,14 +52,34 @@
       <option name="url" value="https://hub.spigotmc.org/nexus/content/repositories/snapshots/" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="ess-repo" />
+      <option name="name" value="ess-repo" />
+      <option name="url" value="https://ci.ender.zone/plugin/repository/everything/" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="enginehub-maven" />
       <option name="name" value="enginehub-maven" />
       <option name="url" value="http://maven.enginehub.org/repo/" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="paper-repo" />
+      <option name="name" value="paper-repo" />
+      <option name="url" value="https://papermc.io/repo/repository/maven-public/" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="elmakers-maven" />
       <option name="name" value="elmakers-maven" />
       <option name="url" value="http://maven.elmakers.com/repository/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="lunar" />
+      <option name="name" value="lunar" />
+      <option name="url" value="https://maven.moonsworth.com/repository/lunarclient-public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="skullcreator-repo" />
+      <option name="name" value="skullcreator-repo" />
+      <option name="url" value="https://dl.bintray.com/deanveloper/SkullCreator" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="jboss.community" />

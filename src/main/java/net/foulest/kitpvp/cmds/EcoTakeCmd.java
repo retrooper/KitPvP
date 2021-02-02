@@ -32,10 +32,10 @@ public class EcoTakeCmd {
         KitUser targetUser = KitUser.getInstance(target);
         int amount = Integer.parseInt(args.getArgs(1));
 
-        targetUser.setCoins(targetUser.getCoins() - amount);
-        targetUser.save();
+        targetUser.setCoins(Math.max(0, targetUser.getCoins() - amount));
+        targetUser.saveStats();
 
-        if ((args.getSender() instanceof Player) && target == args.getSender()) {
+        if (args.getSender() instanceof Player && target == args.getSender()) {
             MiscUtils.messagePlayer(target, "&aYou set your balance to " + targetUser.getCoins() + " coins. &7(-" + amount + ")");
             return;
         }

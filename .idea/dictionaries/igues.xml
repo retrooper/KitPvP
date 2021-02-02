@@ -21,6 +21,7 @@
       <w>cooldowns</w>
       <w>currentkit</w>
       <w>damager</w>
+      <w>damager's</w>
       <w>diorite</w>
       <w>ecogive</w>
       <w>ecoset</w>
@@ -39,13 +40,17 @@
       <w>ewas</w>
       <w>fletching</w>
       <w>fpvp</w>
+      <w>gamemode</w>
       <w>ghast</w>
       <w>glowstone</w>
       <w>golem</w>
+      <w>golems</w>
       <w>hookshot</w>
+      <w>hotbar</w>
       <w>imprisoner</w>
       <w>killstreak</w>
       <w>kitpvp</w>
+      <w>knockback</w>
       <w>lapis</w>
       <w>levelup</w>
       <w>lores</w>

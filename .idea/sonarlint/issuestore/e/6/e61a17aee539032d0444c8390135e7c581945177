@@ -1,5 +1,9 @@
 
-N
-java:S3011^",This accessibility update should be removed.(¹œËøÿÿÿÿ8½ÉëÔ.
-N
-java:S3011_",This accessibility bypass should be removed.(çŒê‘ÿÿÿÿÿ8½ÉëÔ.
+O
+java:S3011",This accessibility bypass should be removed.(çŒê‘ÿÿÿÿÿ8¢ˆáõ.
+t
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 45 to the 15 allowed.(È´™úÿÿÿÿ8îâ¹ó.
+O
+java:S3011",This accessibility update should be removed.(¹œËøÿÿÿÿ8¢ˆáõ.
+W
+java:S1118":Add a private constructor to hide the implicit public one.(È€²8¢ áõ.

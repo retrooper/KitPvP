@@ -1,7 +1,16 @@
 
-B
-java:S3011+",This accessibility update should be removed.(˜ÂÓ˜
-C
-java:S3011½",This accessibility update should be removed.(˜ÂÓ˜
-C
-java:S3011Â",This accessibility bypass should be removed.(êô—İ
+I
+java:S3011,",This accessibility update should be removed.(˜ÂÓ˜8‘’·”ó.
+o
+java:S3776B"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(ÆÏå´8€ÏŞ.
+V
+java:S3516B"9Refactor this method to not always return the same value.(ÆÏå´8€ÏŞ.
+J
+java:S3011À",This accessibility update should be removed.(˜ÂÓ˜8‘’·”ó.
+u	java:S135s"YReduce the total number of break and continue statements in this loop to use at most one.(ü÷8€ÏŞ.
+J
+java:S3011Å",This accessibility bypass should be removed.(êô—İ8‘’·”ó.
+n
+java:S3776r"RRefactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.(ˆ«¸:8€ÏŞ.
+S
+java:S1128"6Remove this unused import 'net.foulest.kitpvp.KitPvP'.(æ°…§8šü¢áõ.
