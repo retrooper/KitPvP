@@ -41,7 +41,7 @@ public class Hulk implements Kit {
     public List<ItemStack> getItems() {
         ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
         ItemStack special = new ItemBuilder(Material.PISTON_STICKY_BASE).name("&aHulk Smash &7(Right Click)")
-                .lore("&7Deals nearby players immense knockback.").build();
+                .lore("&7Deals players immense knockback.").build();
         return Arrays.asList(sword, special);
     }
 
@@ -60,7 +60,7 @@ public class Hulk implements Kit {
 
     @Override
     public String getDescription() {
-        return "&7Hulk SMASH opponents away.";
+        return "&7Deals players immense knockback.";
     }
 
     @Override

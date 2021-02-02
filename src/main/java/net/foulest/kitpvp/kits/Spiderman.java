@@ -38,7 +38,7 @@ public class Spiderman implements Kit {
     public List<ItemStack> getItems() {
         ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
         ItemStack special = new ItemBuilder(Material.WEB).name("&aWeb Slinger &7(Right Click)")
-                .lore("&7Traps a player in cobwebs.").build();
+                .lore("&7Traps players in cobwebs.").build();
         return Arrays.asList(sword, special);
     }
 
@@ -49,7 +49,7 @@ public class Spiderman implements Kit {
 
         return new ItemStack[]{
                 new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fSpiderman's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.RED).unbreakable(true).build(),
+                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0xCC2E33)).unbreakable(true).build(),
                 new ItemBuilder(Material.DIAMOND_LEGGINGS).unbreakable(true).build(),
                 new ItemBuilder(Material.DIAMOND_BOOTS).unbreakable(true).build()
         };
@@ -57,7 +57,7 @@ public class Spiderman implements Kit {
 
     @Override
     public String getDescription() {
-        return "&7Master of long-ranged combat.";
+        return "&7Traps players in cobwebs.";
     }
 
     @Override

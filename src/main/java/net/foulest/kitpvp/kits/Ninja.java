@@ -50,7 +50,7 @@ public class Ninja implements Kit {
 
         return new ItemStack[]{
                 new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fNinja's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.BLACK).unbreakable(true).build(),
+                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0x0C0C0C)).unbreakable(true).build(),
                 new ItemBuilder(Material.CHAINMAIL_LEGGINGS).unbreakable(true).build(),
                 new ItemBuilder(Material.CHAINMAIL_BOOTS).unbreakable(true).build()
         };

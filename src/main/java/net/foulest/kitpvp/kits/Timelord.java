@@ -37,7 +37,7 @@ public class Timelord implements Kit {
     public List<ItemStack> getItems() {
         ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
         ItemStack special = new ItemBuilder(Material.WATCH).name("&aFreeze Time &7(Right Click)")
-                .lore("&7Freezes nearby players.").build();
+                .lore("&7Freezes players in time.").build();
         return Arrays.asList(sword, special);
     }
 
@@ -56,7 +56,7 @@ public class Timelord implements Kit {
 
     @Override
     public String getDescription() {
-        return "&7Freeze nearby players in time.";
+        return "&7Freezes players in time.";
     }
 
     @Override

@@ -38,7 +38,7 @@ public class Imprisoner implements Kit {
     public List<ItemStack> getItems() {
         ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
         ItemStack special = new ItemBuilder(Material.DISPENSER).name("&aLava Prison &7(Right Click)")
-                .lore("&7Send your opponents to jail.").build();
+                .lore("&7Sends players to jail.").build();
         return Arrays.asList(sword, special);
     }
 
@@ -49,7 +49,7 @@ public class Imprisoner implements Kit {
 
         return new ItemStack[]{
                 new ItemBuilder(SkullCreator.itemFromBase64(base64)).name("&fImprisoner's Head").unbreakable(true).build(),
-                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.BLUE).unbreakable(true).build(),
+                new ItemBuilder(Material.LEATHER_CHESTPLATE).color(Color.fromRGB(0x1E4866)).unbreakable(true).build(),
                 new ItemBuilder(Material.IRON_LEGGINGS).unbreakable(true).build(),
                 new ItemBuilder(Material.IRON_BOOTS).unbreakable(true).build()
         };
@@ -57,7 +57,7 @@ public class Imprisoner implements Kit {
 
     @Override
     public String getDescription() {
-        return "&7Send your opponents to jail.";
+        return "&7Sends players to jail.";
     }
 
     @Override

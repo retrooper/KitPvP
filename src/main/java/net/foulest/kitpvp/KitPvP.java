@@ -65,6 +65,8 @@ public class KitPvP extends JavaPlugin {
         hikari.addDataSourceProperty("databaseName", ConfigManager.get().getString("mysql.database"));
         hikari.addDataSourceProperty("user", ConfigManager.get().getString("mysql.user"));
         hikari.addDataSourceProperty("password", ConfigManager.get().getString("mysql.password"));
+        hikari.addDataSourceProperty("characterEncoding", "utf8");
+        hikari.addDataSourceProperty("useUnicode", "true");
 
         // Creates missing tables in the MySQL database.
         try (Connection connection = hikari.getConnection();
@@ -85,7 +87,7 @@ public class KitPvP extends JavaPlugin {
         // Loads the plugin's commands.
         loadCommands(new BalanceCmd(), new ClearKitCmd(), new CombatLogCmd(), new EcoGiveCmd(), new EcoSetCmd(),
                 new KitsCmd(), new PayCmd(), new SetSpawnCmd(), new SpawnCmd(), new StatsCmd(), new KitShopCmd(),
-                new StaffCmd(), new EcoTakeCmd());
+                new StaffCmd(), new EcoTakeCmd(), new ArmorColorCmd());
 
         // Loads the plugin's kits.
         loadKits(new Archer(), new Burrower(), new Cactus(), new Dragon(), new Fisherman(), new Ghost(), new Tamer(),
@@ -162,7 +164,7 @@ public class KitPvP extends JavaPlugin {
     /**
      * Loads the plugin's listeners.
      *
-     * @param listeners
+     * @param listeners ?
      */
     private void loadListeners(Listener... listeners) {
         for (Listener listener : listeners) {
@@ -173,7 +175,7 @@ public class KitPvP extends JavaPlugin {
     /**
      * Loads the plugin's commands.
      *
-     * @param commands
+     * @param commands ?
      */
     private void loadCommands(Object... commands) {
         for (Object command : commands) {
@@ -184,7 +186,7 @@ public class KitPvP extends JavaPlugin {
     /**
      * Loads the plugin's kits.
      *
-     * @param kits
+     * @param kits ?
      */
     private void loadKits(Kit... kits) {
         for (Kit kit : kits) {

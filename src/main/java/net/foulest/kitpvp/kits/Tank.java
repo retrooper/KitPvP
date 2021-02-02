@@ -57,7 +57,7 @@ public class Tank implements Kit {
 
     @Override
     public String getDescription() {
-        return "&7Slow but very resistant..";
+        return "&7Slow but very resistant.";
     }
 
     @Override

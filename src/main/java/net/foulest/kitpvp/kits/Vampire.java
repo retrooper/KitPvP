@@ -38,7 +38,7 @@ public class Vampire implements Kit {
     public List<ItemStack> getItems() {
         ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
         ItemStack special = new ItemBuilder(Material.REDSTONE).name("&aDrain Effects &7(Right Click)")
-                .lore("&7Drain effects of other players.").build();
+                .lore("&7Drains players potion effects.").build();
         return Arrays.asList(sword, special);
     }
 
@@ -57,7 +57,7 @@ public class Vampire implements Kit {
 
     @Override
     public String getDescription() {
-        return "&7Drain effects of other players.";
+        return "&7Drains players potion effects.";
     }
 
     @Override

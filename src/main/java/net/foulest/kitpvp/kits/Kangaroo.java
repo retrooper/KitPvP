@@ -42,7 +42,7 @@ public class Kangaroo implements Kit {
     public List<ItemStack> getItems() {
         ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
         ItemStack special = new ItemBuilder(Material.FIREWORK).name("&aHop &7(Right Click)")
-                .lore("&7Hop into the air. Sneak to go farther.").build();
+                .lore("&7Hop around like a Kangaroo.").build();
         return Arrays.asList(sword, special);
     }
 

@@ -330,7 +330,7 @@ public class EventListener implements Listener {
 
                 KitUser.getInstance(player).addOwnedKit(kit);
                 KitUser.getInstance(player).removeCoins(kit.getCost());
-                mySQL.update("INSERT INTO PlayerKits (uuid, kitId) VALUES ( '" + player.getUniqueId().toString() + "', " + kit.getId() + " );");
+                mySQL.update("INSERT INTO PlayerKits (uuid, kitId) VALUES ( '" + player.getUniqueId().toString() + "', " + kit.getId() + " )");
                 MiscUtils.messagePlayer(player, "&aYou purchased the " + kit.getName() + " kit for " + kit.getCost() + " coins.");
                 player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
                 player.closeInventory();

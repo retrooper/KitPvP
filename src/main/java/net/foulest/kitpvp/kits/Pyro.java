@@ -60,7 +60,7 @@ public class Pyro implements Kit {
 
     @Override
     public String getDescription() {
-        return "&7Burn your foes alive.";
+        return "&7Burn other players alive.";
     }
 
     @Override

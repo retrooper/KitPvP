@@ -60,7 +60,7 @@ public class Dragon implements Kit {
 
     @Override
     public String getDescription() {
-        return "&7Breathes fire. Hits like a truck.";
+        return "&7Emits a powerful fiery breath.";
     }
 
     @Override

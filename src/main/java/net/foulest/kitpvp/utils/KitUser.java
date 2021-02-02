@@ -281,7 +281,7 @@ public class KitUser {
 
     public void saveAll() {
         if (!ownedKits.isEmpty()) {
-            mySQL.update("DELETE FROM PlayerKits WHERE uuid='" + player.getUniqueId().toString() + "';");
+            mySQL.update("DELETE FROM PlayerKits WHERE uuid='" + player.getUniqueId().toString() + "'");
 
             for (Kit kits : ownedKits) {
                 if (kits == null) {
@@ -298,7 +298,7 @@ public class KitUser {
     public void saveStats() {
         mySQL.update("UPDATE PlayerStats SET coins=" + getCoins() + ", experience=" + getExperience()
                 + ", kills=" + getKills() + ", deaths=" + getDeaths() + ", killstreak=" + getKillstreak()
-                + ", topKillstreak=" + getTopKillstreak() + " WHERE uuid='" + player.getUniqueId().toString() + "';");
+                + ", topKillstreak=" + getTopKillstreak() + " WHERE uuid='" + player.getUniqueId().toString() + "'");
     }
 
     public void unload() {
