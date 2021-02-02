@@ -111,7 +111,8 @@ public class KitListener implements Listener {
                     KitUser receiverUser = KitUser.getInstance(receiver);
 
                     if (player.hasLineOfSight(entity) && !receiverUser.isInSafezone()) {
-                        receiver.damage(4, player);
+                        receiver.damage(1, player);
+                        receiver.setHealth(receiver.getHealth() - 4);
                         receiver.setFireTicks(150);
                     }
                 }
@@ -181,9 +182,6 @@ public class KitListener implements Listener {
                 Wolf wolf = (Wolf) player.getWorld().spawnEntity(player.getLocation(), EntityType.WOLF);
                 wolf.setOwner(player);
                 wolf.isAngry();
-                wolf.setMaxHealth(20.0);
-                wolf.setHealth(20.0);
-                wolf.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 99999, 2, false, false));
                 list.add(wolf);
             }
 
@@ -205,7 +203,7 @@ public class KitListener implements Listener {
                 && event.getAction().toString().contains("RIGHT") && player.getItemInHand().getType() == Material.PISTON_STICKY_BASE
                 && !kitUser.hasCooldown(player, "Hulk")) {
 
-            for (Entity entity : player.getNearbyEntities(6, 6, 6)) {
+            for (Entity entity : player.getNearbyEntities(5, 5, 5)) {
                 if (entity instanceof Player) {
                     playerList.add((Player) entity);
                 }

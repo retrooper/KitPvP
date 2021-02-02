@@ -13,6 +13,7 @@ import net.foulest.kitpvp.utils.kits.Kit;
 import net.foulest.kitpvp.utils.kits.KitManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -39,6 +40,7 @@ public class KitUser {
     private final KitManager kitManager = KitManager.getInstance();
     private final List<Kit> ownedKits = new ArrayList<>();
     private BukkitTask abilityCooldownNotifier;
+    private BukkitTask teleportingToSpawn;
     private Kit kit;
     private Kit previousKit;
     private int coins;
@@ -48,7 +50,6 @@ public class KitUser {
     private int deaths;
     private int killstreak;
     private int topKillstreak;
-    private boolean teleportingToSpawn;
     private boolean inStaffMode;
     private boolean isLoaded;
     private boolean pendingNoFallRemoval;
@@ -306,7 +307,7 @@ public class KitUser {
         ownedKits.clear();
         kit = null;
         previousKit = null;
-        teleportingToSpawn = false;
+        teleportingToSpawn = null;
         instances.remove(this);
     }
 
@@ -424,20 +425,18 @@ public class KitUser {
         return Float.parseFloat(format.format(decimal));
     }
 
-    public double getExpPercent() {
+    public int getExpPercent() {
         double percent;
-        String decimalFormatStr = "#####.0#";
-        DecimalFormat format = new DecimalFormat(decimalFormatStr);
-        int nextLevelXP = (level * 25) * 25;
-        int pastLevelXP = (Math.max(1, level - 1) * 25) * 25;
+        int nextLevelXP = (getLevel() * 25) * 25;
+        int pastLevelXP = (Math.max(1, getLevel() - 1) * 25) * 25;
 
-        if (level == 1) {
-            percent = ((double) experience / nextLevelXP) * 100;
+        if (getLevel() == 1) {
+            percent = ((double) getExperience() / nextLevelXP) * 100;
         } else {
-            percent = ((double) (experience - pastLevelXP) / (nextLevelXP - pastLevelXP)) * 100;
+            percent = ((double) (getExperience() - pastLevelXP) / (nextLevelXP - pastLevelXP)) * 100;
         }
 
-        return Double.parseDouble(format.format(percent));
+        return (int) percent;
     }
 
     public void calcLevel(boolean afterKill) {
@@ -447,7 +446,13 @@ public class KitUser {
             level += 1;
 
             if (afterKill) {
-                MiscUtils.messagePlayer(player, "&b&lLEVEL UP! &7You are now &fLevel " + level + "!");
+                player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0f, 1.0f);
+                MiscUtils.messagePlayer(player, "");
+                MiscUtils.messagePlayer(player, "&bLevel Up");
+                MiscUtils.messagePlayer(player, "&7You leveled up to &fLevel " + level);
+                MiscUtils.messagePlayer(player, "&7and earned &f150 Coins&7!");
+                MiscUtils.messagePlayer(player, "");
+                addCoins(150);
             }
         }
 
@@ -460,10 +465,14 @@ public class KitUser {
     }
 
     public boolean isTeleportingToSpawn() {
+        return teleportingToSpawn != null;
+    }
+
+    public BukkitTask getTeleportingToSpawnTask() {
         return teleportingToSpawn;
     }
 
-    public void setTeleportingToSpawn(boolean status) {
-        teleportingToSpawn = status;
+    public void setTeleportingToSpawn(BukkitTask task) {
+        teleportingToSpawn = task;
     }
 }

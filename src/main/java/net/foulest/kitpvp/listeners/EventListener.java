@@ -72,7 +72,7 @@ public class EventListener implements Listener {
         }
 
         for (Player p : Bukkit.getOnlinePlayers()) {
-            if (KitUser.getInstance(p).isInStaffMode() && !player.hasPermission("kitpvp.staff")) {
+            if (p.hasMetadata("vanished") && !player.hasPermission("kitpvp.staff")) {
                 player.hidePlayer(p);
             }
         }
@@ -267,7 +267,9 @@ public class EventListener implements Listener {
             KitUser kitUser = KitUser.getInstance(player);
 
             if (kitUser.isTeleportingToSpawn()) {
-                kitUser.setTeleportingToSpawn(false);
+                kitUser.getTeleportingToSpawnTask().cancel();
+                MiscUtils.messagePlayer(player, MiscUtils.colorize("&cTeleportation cancelled."));
+                kitUser.setTeleportingToSpawn(null);
             }
         }
     }
@@ -413,6 +415,7 @@ public class EventListener implements Listener {
                 case WEB:
                 case BLAZE_ROD:
                 case IRON_BLOCK:
+                case SLIME_BALL:
                 case DISPENSER:
                     break;
 
@@ -441,6 +444,29 @@ public class EventListener implements Listener {
                         player.playSound(player.getLocation(), Sound.SLIME_WALK, 1, 1);
                         player.updateInventory();
                         player.closeInventory();
+                    }
+                    break;
+
+                case SKULL_ITEM:
+                    if (item.hasItemMeta() && item.getItemMeta().getDisplayName().contains("Your Stats")) {
+                        event.setCancelled(true);
+                        player.updateInventory();
+                        MiscUtils.messagePlayer(player, "");
+                        MiscUtils.messagePlayer(player, " &aYour Stats");
+                        MiscUtils.messagePlayer(player, " &fKills: &e" + kitUser.getKills());
+                        MiscUtils.messagePlayer(player, " &fDeaths: &e" + kitUser.getDeaths());
+                        MiscUtils.messagePlayer(player, " &fK/D Ratio: &e" + kitUser.getKDRText());
+                        MiscUtils.messagePlayer(player, "");
+                        MiscUtils.messagePlayer(player, " &fStreak: &e" + kitUser.getKillstreak());
+                        MiscUtils.messagePlayer(player, " &fHighest Streak: &e" + kitUser.getTopKillstreak());
+                        MiscUtils.messagePlayer(player, "");
+                        MiscUtils.messagePlayer(player, " &fLevel: &e" + kitUser.getLevel() + " &7(" + kitUser.getExpPercent() + "%)");
+                        MiscUtils.messagePlayer(player, " &fCoins: &6" + kitUser.getCoins());
+                        MiscUtils.messagePlayer(player, " &fBounty: &cWIP");
+                        MiscUtils.messagePlayer(player, "");
+                        MiscUtils.messagePlayer(player, " &fEvents Won: &cWIP");
+                        MiscUtils.messagePlayer(player, " &fMost Used Kit: &cWIP");
+                        MiscUtils.messagePlayer(player, "");
                     }
                     break;
 

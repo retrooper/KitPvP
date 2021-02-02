@@ -37,7 +37,7 @@ public class Mage implements Kit {
     public List<ItemStack> getItems() {
         ItemStack sword = new ItemBuilder(Material.STONE_SWORD).unbreakable(true).build();
         ItemStack special = new ItemBuilder(Material.GLOWSTONE_DUST).name("&aRandom Effect &7(Right Click)")
-                .lore("&7Get random potion effects.").build();
+                .lore("&7Gives you random potion effects.").build();
         return Arrays.asList(sword, special);
     }
 
@@ -56,7 +56,7 @@ public class Mage implements Kit {
 
     @Override
     public String getDescription() {
-        return "&7Get random potion effects.";
+        return "&7Gives you random potion effects.";
     }
 
     @Override

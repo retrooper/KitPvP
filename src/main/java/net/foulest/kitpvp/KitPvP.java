@@ -82,7 +82,7 @@ public class KitPvP extends JavaPlugin {
         Bukkit.getMessenger().registerIncomingPluginChannel(this, "MC|Brand", new BrandListener());
 
         // Loads the plugin's listeners.
-        loadListeners(new EventListener(), new KitListener(), new DeathListener());
+        loadListeners(new DeathListener(), new EventListener(), new KitListener());
 
         // Loads the plugin's commands.
         loadCommands(new BalanceCmd(), new ClearKitCmd(), new CombatLogCmd(), new EcoGiveCmd(), new EcoSetCmd(),
@@ -143,14 +143,15 @@ public class KitPvP extends JavaPlugin {
             player.getInventory().setItem(0, kitSelector);
 
             ItemStack shopSelector = new ItemBuilder(Material.ENDER_CHEST).name("&aKit Shop &7(Right Click)").build();
-            player.getInventory().setItem(2, shopSelector);
-
-            // TODO: Add leaderboard system
+            player.getInventory().setItem(1, shopSelector);
 
             if (user.hasPreviousKit()) {
-                ItemStack previousKit = new ItemBuilder(Material.WATCH).name("&aPrevious Kit: &e" + user.getPreviousKit().getName()).build();
-                player.getInventory().setItem(6, previousKit);
+                ItemStack previousKit = new ItemBuilder(Material.WATCH).name("&aPrevious Kit &7(Right Click)").build();
+                player.getInventory().setItem(2, previousKit);
             }
+
+            ItemStack yourStats = new ItemBuilder(SkullCreator.itemFromUuid(player.getUniqueId())).name("&aYour Stats &7(Right Click)").build();
+            player.getInventory().setItem(4, yourStats);
 
             if (player.hasPermission("kitpvp.staff")) {
                 ItemStack staffMode = new ItemBuilder(Material.EYE_OF_ENDER).name("&aStaff Mode &7(Right Click)").build();
@@ -164,7 +165,7 @@ public class KitPvP extends JavaPlugin {
     /**
      * Loads the plugin's listeners.
      *
-     * @param listeners ?
+     * @param listeners Listener to load.
      */
     private void loadListeners(Listener... listeners) {
         for (Listener listener : listeners) {
@@ -175,7 +176,7 @@ public class KitPvP extends JavaPlugin {
     /**
      * Loads the plugin's commands.
      *
-     * @param commands ?
+     * @param commands Command to load.
      */
     private void loadCommands(Object... commands) {
         for (Object command : commands) {
@@ -186,7 +187,7 @@ public class KitPvP extends JavaPlugin {
     /**
      * Loads the plugin's kits.
      *
-     * @param kits ?
+     * @param kits Kit to load.
      */
     private void loadKits(Kit... kits) {
         for (Kit kit : kits) {

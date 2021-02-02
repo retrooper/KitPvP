@@ -29,27 +29,37 @@ public class Spawn {
         loc.getWorld().setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
     }
 
+    /**
+     * Teleports a player to spawn.
+     *
+     * @param player The player to teleport.
+     */
     public void teleport(Player player) {
+        KitUser kitUser = KitUser.getInstance(player);
+
         if (location == null) {
             MiscUtils.messagePlayer(player, "&cThe spawn point is not set. Please contact an administrator.");
             return;
         }
 
-        KitUser user = KitUser.getInstance(player);
-        user.clearCooldowns();
-        user.setKit(null);
-
-        player.setHealth(20);
+        kitUser.clearCooldowns();
+        kitUser.setKit(null);
 
         for (PotionEffect effect : player.getActivePotionEffects()) {
             player.removePotionEffect(effect.getType());
         }
 
+        player.setHealth(20);
         kitPvP.giveDefaultItems(player);
 
         player.teleport(location);
+        player.teleport(new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY(),
+                player.getLocation().getZ(), location.getYaw(), location.getPitch())); // Might fix the yaw bug.
     }
 
+    /**
+     * Saves the spawn point data into the config files.
+     */
     public void save() {
         if (location == null) {
             return;

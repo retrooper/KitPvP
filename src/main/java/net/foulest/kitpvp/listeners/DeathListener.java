@@ -84,7 +84,7 @@ public class DeathListener implements Listener {
             // Run specific code if the damager is on a multiple of 5 killstreak.
             if (damager.getKillstreak() >= 5 && damager.getKillstreak() % 5 == 0) {
                 // Sends all online players a killstreak message in chat.
-                MiscUtils.broadcastMessage("&e&lSTREAK! &f" + damager.getPlayer().getName() + " &7is on a &f" + damager.getKillstreak() + " &7killstreak!");
+                MiscUtils.broadcastMessage("&a" + damager.getPlayer().getName() + " &eis on a &a" + damager.getKillstreak() + " &ekillstreak!");
 
                 // Refills the damager's inventory with soup.
                 for (int i = 0; i < 36; ++i) {
@@ -107,12 +107,12 @@ public class DeathListener implements Listener {
             damager.saveStats();
 
             // Prints kill messages to both the damager and receiver.
-            MiscUtils.messagePlayer(receiver.getPlayer(), "&c&lYOU DIED! &f" + damager.getPlayer().getName()
-                    + " &7killed you on &f" + damager.getPlayer().getHealth() + " health.");
-            MiscUtils.messagePlayer(damager.getPlayer(), "&a&lKILL! &7You killed &f" + receiver.getPlayer().getName()
-                    + "&7. (+" + rewardAmount + " coins, +25 exp)");
+            MiscUtils.messagePlayer(receiver.getPlayer(), "&cYou were killed by &e" + damager.getPlayer().getName()
+                    + " &con &e" + damager.getPlayer().getHealth() + " health.");
+            MiscUtils.messagePlayer(damager.getPlayer(), "&eYou killed &a" + receiver.getPlayer().getName()
+                    + "&e for &a" + rewardAmount + " coins &eand &a25 exp&e.");
         } else {
-            MiscUtils.messagePlayer(player, "&c&lYOU DIED! &7You killed yourself.");
+            MiscUtils.messagePlayer(player, "&cYou killed yourself.");
         }
 
         // Clears cooldowns.
@@ -120,7 +120,7 @@ public class DeathListener implements Listener {
 
         // Sends all online players a killstreak message in chat.
         if (receiver.getKillstreak() >= 5) {
-            MiscUtils.broadcastMessage("&e&lSTREAK! &f" + receiver.getPlayer().getName() + " &7lost their killstreak of &f" + receiver.getKillstreak() + "&7.");
+            MiscUtils.broadcastMessage("&a" + receiver.getPlayer().getName() + " &edied and lost their &a" + receiver.getKillstreak() + " &ekillstreak.");
         }
 
         // Removes the player's combat tag.

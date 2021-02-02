@@ -4,8 +4,6 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.foulest.kitpvp.listeners.CombatLog;
 import org.bukkit.entity.Player;
 
-import java.text.DecimalFormat;
-
 public class Placeholders extends PlaceholderExpansion {
 
     private final CombatLog combatLog = CombatLog.getInstance();
@@ -22,7 +20,7 @@ public class Placeholders extends PlaceholderExpansion {
 
     @Override
     public String getVersion() {
-        return "1.0.2";
+        return "1.0.3";
     }
 
     @Override
@@ -107,24 +105,12 @@ public class Placeholders extends PlaceholderExpansion {
                 return "0";
             }
 
-            double percent;
-            String decimalFormatStr = "#####.0#";
-            DecimalFormat format = new DecimalFormat(decimalFormatStr);
-            int nextLevelXP = (user.getLevel() * 25) * 25;
-            int pastLevelXP = (Math.max(1, user.getLevel() - 1) * 25) * 25;
-
-            if (user.getLevel() == 1) {
-                percent = ((double) user.getExperience() / nextLevelXP) * 100;
-            } else {
-                percent = ((double) (user.getExperience() - pastLevelXP) / (nextLevelXP - pastLevelXP)) * 100;
-            }
-
-            return "" + format.format(percent) + "%";
+            return "" + user.getExpPercent() + "%";
         }
 
         // Placeholder: %kitpvp_combattag%
         if (identifier.equals("combattag")) {
-            return combatLog.isInCombat(player) ? "&cFighting" : "&aSafe";
+            return combatLog.isInCombat(player) ? "00:" + combatLog.getRemainingTime(player) : "Safe";
         }
 
         // Placeholder: %kitpvp_activekit%

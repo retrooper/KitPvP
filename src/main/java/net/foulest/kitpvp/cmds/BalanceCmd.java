@@ -18,7 +18,7 @@ public class BalanceCmd {
         CommandSender sender = args.getSender();
 
         if (args.length() != 1) {
-            MiscUtils.messagePlayer(sender, "Your Coins: &6" + KitUser.getInstance(player).getCoins());
+            MiscUtils.messagePlayer(sender, "&fCoins: &6" + KitUser.getInstance(player).getCoins());
             return;
         }
 
@@ -32,10 +32,10 @@ public class BalanceCmd {
                 return;
             }
 
-            MiscUtils.messagePlayer(sender, "" + offlinePlayer.getName() + "'s Coins: &6" + KitUser.getInstance(offlinePlayer.getPlayer()).getCoins());
+            MiscUtils.messagePlayer(sender, "&f" + offlinePlayer.getName() + "'s Coins: &6" + KitUser.getInstance(offlinePlayer.getPlayer()).getCoins());
             return;
         }
 
-        MiscUtils.messagePlayer(args.getSender(), "" + target.getName() + "'s Coins: &6" + KitUser.getInstance(target).getCoins());
+        MiscUtils.messagePlayer(args.getSender(), "&f" + target.getName() + "'s Coins: &6" + KitUser.getInstance(target).getCoins());
     }
 }

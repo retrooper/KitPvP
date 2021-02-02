@@ -41,27 +41,17 @@ public class SpawnCmd {
             return;
         }
 
-        kitUser.setTeleportingToSpawn(true);
-
-        new BukkitRunnable() {
+        kitUser.setTeleportingToSpawn(new BukkitRunnable() {
             final long teleportTime = System.currentTimeMillis();
             long pastValue = 6;
 
             public void run() {
                 long secondsDiff = Math.round(((teleportTime - System.currentTimeMillis()) + 5500) / 1000.0D);
-
-                // Cancels teleport if the player, for whatever reason, is no longer teleporting to spawn.
-                if (!kitUser.isTeleportingToSpawn()) {
-                    MiscUtils.messagePlayer(player, MiscUtils.colorize("&cTeleportation cancelled."));
-                    cancel();
-                    return;
-                }
-
                 // Cancels teleport if the player enters combat.
                 if (combatLog.isInCombat(player)) {
                     MiscUtils.messagePlayer(player, MiscUtils.colorize("&cTeleportation cancelled, you entered combat."));
-                    kitUser.setTeleportingToSpawn(false);
                     cancel();
+                    kitUser.setTeleportingToSpawn(null);
                     return;
                 }
 
@@ -70,8 +60,8 @@ public class SpawnCmd {
                         || player.getLocation().getBlockY() != playerLoc.getBlockY()
                         || player.getLocation().getBlockZ() != playerLoc.getBlockZ()) {
                     MiscUtils.messagePlayer(player, MiscUtils.colorize("&cTeleportation cancelled, you moved."));
-                    kitUser.setTeleportingToSpawn(false);
                     cancel();
+                    kitUser.setTeleportingToSpawn(null);
                     return;
                 }
 
@@ -81,8 +71,8 @@ public class SpawnCmd {
                     player.getInventory().setHeldItemSlot(0);
                     player.playSound(player.getLocation(), Sound.CHICKEN_EGG_POP, 0.5f, 0.0f);
                     MiscUtils.messagePlayer(player, MiscUtils.colorize("&aTeleported to spawn."));
-                    kitUser.setTeleportingToSpawn(false);
                     cancel();
+                    kitUser.setTeleportingToSpawn(null);
                     return;
                 }
 
@@ -94,6 +84,6 @@ public class SpawnCmd {
 
                 pastValue = secondsDiff;
             }
-        }.runTaskTimer(kitPvP, 0L, 0L);
+        }.runTaskTimer(kitPvP, 0L, 0L));
     }
 }
